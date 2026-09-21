@@ -7,6 +7,7 @@ import { Task } from '@/lib/types';
 import { TaskCard } from '@/components/ui/TaskCard';
 import { AIProcessing } from '@/components/ui/AIProcessing';
 import { DashboardMetrics } from '@/components/ui/DashboardMetrics';
+import { IntroSequence } from '@/components/ui/IntroSequence';
 
 const MOCK_GENERATED_TASKS: Task[] = [
   { id: '1', title: 'Follow up with Sara', category: 'Payment', priority: 'HIGH', deadline: 'Today', completed: false },
@@ -16,6 +17,7 @@ const MOCK_GENERATED_TASKS: Task[] = [
 ];
 
 export default function Dashboard() {
+  const [showIntro, setShowIntro] = useState(true);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -50,7 +52,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-[80vh] w-full pt-10 pb-20">
+    <>
+      {showIntro && <IntroSequence onComplete={() => setShowIntro(false)} />}
+      
+      <div className="flex flex-col items-center justify-start min-h-[80vh] w-full pt-10 pb-20">
       
       <AnimatePresence mode="wait">
         {!hasProcessed && !isProcessing && (
@@ -159,5 +164,6 @@ export default function Dashboard() {
       </AnimatePresence>
 
     </div>
+    </>
   );
 }
