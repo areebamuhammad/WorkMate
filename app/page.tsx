@@ -9,12 +9,7 @@ import { AIProcessing } from '@/components/ui/AIProcessing';
 import { DashboardMetrics } from '@/components/ui/DashboardMetrics';
 import { IntroSequence } from '@/components/ui/IntroSequence';
 
-const MOCK_GENERATED_TASKS: Task[] = [
-  { id: '1', title: 'Follow up with Sara', category: 'Payment', priority: 'HIGH', deadline: 'Today', completed: false },
-  { id: '2', title: "Confirm Ahmed's order", category: 'Order', priority: 'HIGH', deadline: 'Tomorrow', completed: false },
-  { id: '3', title: 'Post new collection', category: 'Marketing', priority: 'MEDIUM', deadline: 'Tonight', completed: false },
-  { id: '4', title: 'Ali — appointment', category: 'Customer', priority: 'NORMAL', deadline: 'Friday', completed: false },
-];
+
 
 export default function Dashboard() {
   const [showIntro, setShowIntro] = useState(true);

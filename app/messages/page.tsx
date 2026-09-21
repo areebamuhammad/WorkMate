@@ -13,27 +13,40 @@ export default function MessagesPage() {
   const [suggestedReply, setSuggestedReply] = useState('');
   const [selectedTone, setSelectedTone] = useState<Tone>('Friendly');
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const customerMessage = "Hi, I ordered this two days ago but nobody has told me when it will arrive.";
 
-  const handleGenerateReply = () => {
+  const handleGenerateReply = async (forcedTone?: Tone) => {
+    const toneToUse = forcedTone || selectedTone;
+    
     setIsProcessing(true);
     setSuggestedReply('');
     setCopied(false);
+    setError(null);
     
-    // Simulate AI thinking
-    setTimeout(() => {
-      setIsProcessing(false);
-      setHasGenerated(true);
-      
-      if (selectedTone === 'Friendly') {
-        setSuggestedReply("Hi! Thanks for reaching out, and I'm sorry for the delay. Let me check your order status and get back to you with an update shortly.");
-      } else if (selectedTone === 'Professional') {
-        setSuggestedReply("Hello. Thank you for your inquiry regarding your order. We are currently looking into the status and will provide you with an update as soon as possible.");
-      } else {
-        setSuggestedReply("Hey there! Sorry about the wait. I'm checking on your order right now and I'll text you back in a few minutes with an update.");
+    try {
+      const response = await fetch('/api/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerMessage, tone: toneToUse })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate reply.');
       }
-    }, 2000);
+
+      const data = await response.json();
+      setSuggestedReply(data.reply || '');
+      setHasGenerated(true);
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'An error occurred. Please try again.');
+      setHasGenerated(false);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleCopy = () => {
@@ -74,6 +87,12 @@ export default function MessagesPage() {
 
         {/* AI Action Area */}
         <div className="flex flex-col items-center gap-6">
+
+          {error && (
+            <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
           
           <AnimatePresence mode="wait">
             {!isProcessing && !hasGenerated && (
@@ -82,7 +101,7 @@ export default function MessagesPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                onClick={handleGenerateReply}
+                onClick={() => handleGenerateReply()}
                 className="group relative overflow-hidden flex items-center gap-2 bg-white text-black px-8 py-3.5 rounded-full font-medium transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.3)] mt-4"
               >
                 <Sparkles className="w-4 h-4" />
@@ -128,7 +147,7 @@ export default function MessagesPage() {
                       key={tone}
                       onClick={() => {
                         setSelectedTone(tone);
-                        handleGenerateReply();
+                        handleGenerateReply(tone);
                       }}
                       className={cn(
                         "px-5 py-2 rounded-full text-sm font-medium transition-all",
