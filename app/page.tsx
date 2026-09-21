@@ -23,18 +23,36 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hasProcessed, setHasProcessed] = useState(false);
 
-  const handleOrganize = () => {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleOrganize = async () => {
     if (!inputText.trim()) return;
     
     setIsProcessing(true);
+    setError(null);
     
-    // Simulate AI processing (matches the AIProcessing component stages)
-    setTimeout(() => {
-      setIsProcessing(false);
-      setTasks(MOCK_GENERATED_TASKS);
+    try {
+      const response = await fetch('/api/organize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: inputText })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to organize work.');
+      }
+
+      const data = await response.json();
+      setTasks(data.tasks || []);
       setHasProcessed(true);
       setInputText('');
-    }, 2400); // 3 stages * 800ms
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'An error occurred. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const toggleTask = (taskId: string) => {
@@ -44,7 +62,7 @@ export default function Dashboard() {
         return {
           ...t,
           completed,
-          priority: completed ? 'COMPLETED' : MOCK_GENERATED_TASKS.find(m => m.id === taskId)?.priority || 'NORMAL'
+          priority: completed ? 'COMPLETED' : 'NORMAL'
         };
       }
       return t;
@@ -89,6 +107,12 @@ export default function Dashboard() {
                   placeholder="e.g. Ahmed needs 3 blue shirts tomorrow. Sara hasn't paid yet..."
                   className="w-full bg-transparent p-8 text-xl md:text-2xl font-light resize-none outline-none min-h-[180px] text-foreground placeholder:text-muted-foreground/40 leading-relaxed"
                 />
+
+                {error && (
+                  <div className="mx-6 mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                    {error}
+                  </div>
+                )}
                 
                 <div className="flex items-center justify-between p-4 px-6 border-t border-white/5 bg-white/[0.01]">
                   <div className="text-sm font-medium text-muted-foreground/60">
