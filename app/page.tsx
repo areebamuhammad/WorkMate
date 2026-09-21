@@ -1,69 +1,163 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { Task } from '@/lib/types';
+import { TaskCard } from '@/components/ui/TaskCard';
+import { AIProcessing } from '@/components/ui/AIProcessing';
+import { DashboardMetrics } from '@/components/ui/DashboardMetrics';
+
+const MOCK_GENERATED_TASKS: Task[] = [
+  { id: '1', title: 'Follow up with Sara', category: 'Payment', priority: 'HIGH', deadline: 'Today', completed: false },
+  { id: '2', title: "Confirm Ahmed's order", category: 'Order', priority: 'HIGH', deadline: 'Tomorrow', completed: false },
+  { id: '3', title: 'Post new collection', category: 'Marketing', priority: 'MEDIUM', deadline: 'Tonight', completed: false },
+  { id: '4', title: 'Ali — appointment', category: 'Customer', priority: 'NORMAL', deadline: 'Friday', completed: false },
+];
+
+export default function Dashboard() {
+  const [inputText, setInputText] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [hasProcessed, setHasProcessed] = useState(false);
+
+  const handleOrganize = () => {
+    if (!inputText.trim()) return;
+    
+    setIsProcessing(true);
+    
+    // Simulate AI processing (matches the AIProcessing component stages)
+    setTimeout(() => {
+      setIsProcessing(false);
+      setTasks(MOCK_GENERATED_TASKS);
+      setHasProcessed(true);
+      setInputText('');
+    }, 2400); // 3 stages * 800ms
+  };
+
+  const toggleTask = (taskId: string) => {
+    setTasks(tasks.map(t => {
+      if (t.id === taskId) {
+        const completed = !t.completed;
+        return {
+          ...t,
+          completed,
+          priority: completed ? 'COMPLETED' : MOCK_GENERATED_TASKS.find(m => m.id === taskId)?.priority || 'NORMAL'
+        };
+      }
+      return t;
+    }));
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col items-center justify-start min-h-[80vh] w-full pt-10 pb-20">
+      
+      <AnimatePresence mode="wait">
+        {!hasProcessed && !isProcessing && (
+          <motion.div 
+            key="composer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-2xl flex flex-col items-center gap-10 mt-10"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <div className="space-y-4 text-center">
+              <div className="inline-flex items-center justify-center p-2 bg-white/5 rounded-2xl mb-4 border border-white/10 shadow-2xl">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-6xl font-medium tracking-tight text-white drop-shadow-sm">
+                Good morning.
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground font-light tracking-wide">
+                What do we need to organize today?
+              </p>
+            </div>
+
+            <div className="w-full relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-white/10 to-blue-500/20 rounded-[32px] blur-xl opacity-50 group-focus-within:opacity-100 transition duration-1000"></div>
+              
+              <div className="relative bg-background/50 backdrop-blur-2xl border border-white/10 rounded-[28px] shadow-2xl flex flex-col overflow-hidden transition-all duration-500 focus-within:border-white/30 focus-within:bg-background/80">
+                <textarea
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder="e.g. Ahmed needs 3 blue shirts tomorrow. Sara hasn't paid yet..."
+                  className="w-full bg-transparent p-8 text-xl md:text-2xl font-light resize-none outline-none min-h-[180px] text-foreground placeholder:text-muted-foreground/40 leading-relaxed"
+                />
+                
+                <div className="flex items-center justify-between p-4 px-6 border-t border-white/5 bg-white/[0.01]">
+                  <div className="text-sm font-medium text-muted-foreground/60">
+                    Press <kbd className="font-mono bg-white/10 px-2 py-0.5 rounded text-white/80">⌘ Enter</kbd> to organize
+                  </div>
+                  
+                  <button
+                    onClick={handleOrganize}
+                    disabled={!inputText.trim()}
+                    className="group/btn relative overflow-hidden flex items-center gap-2 bg-white text-black px-8 py-3 rounded-full font-medium transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:pointer-events-none disabled:hover:scale-100 shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                  >
+                    <span className="relative z-10 flex items-center gap-2">
+                      ORGANIZE <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {isProcessing && (
+          <motion.div
+            key="processing"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+            transition={{ duration: 0.5 }}
+            className="w-full flex-1 flex items-center justify-center min-h-[60vh]"
           >
-            Documentation
-          </a>
-        </div>
-      </main>
+            <AIProcessing />
+          </motion.div>
+        )}
+
+        {hasProcessed && !isProcessing && (
+          <motion.div
+            key="dashboard"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="w-full max-w-5xl flex flex-col gap-8"
+          >
+            <DashboardMetrics tasks={tasks} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {tasks.map((task, index) => (
+                <TaskCard 
+                  key={task.id} 
+                  task={task} 
+                  index={index} 
+                  onToggle={toggleTask} 
+                />
+              ))}
+            </div>
+            
+            {/* Action to add more */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              className="mt-8 flex justify-center"
+            >
+              <button 
+                onClick={() => setHasProcessed(false)}
+                className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                Add More Work
+              </button>
+            </motion.div>
+
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
