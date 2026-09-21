@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Task } from '@/lib/types';
@@ -9,16 +9,45 @@ import { AIProcessing } from '@/components/ui/AIProcessing';
 import { DashboardMetrics } from '@/components/ui/DashboardMetrics';
 import { IntroSequence } from '@/components/ui/IntroSequence';
 
-
-
 export default function Dashboard() {
   const [showIntro, setShowIntro] = useState(true);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hasProcessed, setHasProcessed] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+
+  // Read from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedTasksStr = localStorage.getItem('workmate_tasks');
+      if (savedTasksStr) {
+        const savedTasks = JSON.parse(savedTasksStr);
+        if (Array.isArray(savedTasks) && savedTasks.length > 0) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setTasks(savedTasks);
+           
+          setHasProcessed(true);
+           
+          setShowIntro(false);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse saved tasks', e);
+    } finally {
+       
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // Write to localStorage when tasks change
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('workmate_tasks', JSON.stringify(tasks));
+    }
+  }, [tasks, isLoaded]);
 
   const handleOrganize = async () => {
     if (!inputText.trim()) return;
