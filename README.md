@@ -4,7 +4,9 @@
 
 WorkMate is an AI-powered workspace that transforms unstructured business instructions into organized, actionable tasks.
 
-<!-- HERO: Add a WorkMate dashboard screenshot or short demo GIF here -->
+<p align="center">
+  <img src="./public/workmate-dashboard.png" alt="WorkMate dashboard" width="100%">
+</p>
 
 ## The Problem
 
