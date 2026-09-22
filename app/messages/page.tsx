@@ -15,9 +15,14 @@ export default function MessagesPage() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const customerMessage = "Hi, I ordered this two days ago but nobody has told me when it will arrive.";
+  const [customerMessage, setCustomerMessage] = useState("Hi, I ordered this two days ago but nobody has told me when it will arrive.");
 
   const handleGenerateReply = async (forcedTone?: Tone) => {
+    if (!customerMessage.trim()) {
+      setError('Please enter a customer message first.');
+      return;
+    }
+
     const toneToUse = forcedTone || selectedTone;
     
     setIsProcessing(true);
@@ -55,6 +60,16 @@ export default function MessagesPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleCustomerMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCustomerMessage(e.target.value);
+    if (error) {
+      setError(null);
+    }
+    if (hasGenerated) {
+      setHasGenerated(false);
+    }
+  };
+
   const tones: Tone[] = ['Friendly', 'Professional', 'Casual'];
 
   return (
@@ -75,13 +90,18 @@ export default function MessagesPage() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-2 w-full"
         >
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground ml-2">
             <User className="w-4 h-4" /> Customer
           </div>
-          <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl rounded-tl-sm p-6 text-lg text-white shadow-xl">
-            &quot;{customerMessage}&quot;
+          <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl rounded-tl-sm shadow-xl focus-within:bg-white/15 focus-within:border-white/20 transition-all">
+            <textarea
+              value={customerMessage}
+              onChange={handleCustomerMessageChange}
+              placeholder="Paste customer message here..."
+              className="w-full bg-transparent p-6 text-lg text-white resize-none outline-none min-h-[120px] placeholder:text-white/30"
+            />
           </div>
         </motion.div>
 
