@@ -68,7 +68,7 @@ export default function Dashboard() {
       }
 
       const data = await response.json();
-      setTasks(data.tasks || []);
+      setTasks(prevTasks => [...prevTasks, ...(data.tasks || [])]);
       setHasProcessed(true);
       setInputText('');
     } catch (err: unknown) {
