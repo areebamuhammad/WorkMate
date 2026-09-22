@@ -191,12 +191,12 @@ export default function Dashboard() {
               ))}
             </div>
             
-            {/* Action to add more */}
+            {/* Actions to add more or clear */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
-              className="mt-8 flex justify-center"
+              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
             >
               <button 
                 onClick={() => setHasProcessed(false)}
@@ -204,6 +204,15 @@ export default function Dashboard() {
               >
                 <Sparkles className="w-4 h-4" />
                 Add More Work
+              </button>
+              <button 
+                onClick={() => {
+                  setTasks([]);
+                  setHasProcessed(false);
+                }}
+                className="px-6 py-3 rounded-full text-muted-foreground font-medium hover:text-white transition-colors flex items-center gap-2 text-sm"
+              >
+                Start Fresh
               </button>
             </motion.div>
 
