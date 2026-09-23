@@ -174,7 +174,7 @@ Built for the **Global Innovation Build Challenge V2**.
 
 ## License
 
-License information has not yet been added.
+WorkMate is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## AI-Assisted Development
 
