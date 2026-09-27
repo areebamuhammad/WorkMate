@@ -5,6 +5,14 @@
 WorkMate is an AI-powered workspace that transforms unstructured business instructions into organized, actionable tasks.
 
 <p align="center">
+  <a href="https://work-mate-jade.vercel.app/">Live Demo</a>
+  ·
+  <a href="https://github.com/areebamuhammad/WorkMate">GitHub</a>
+  ·
+  <a href="https://gibc-v2.devpost.com/">GIBC V2</a>
+</p>
+
+<p align="center">
   <img src="./public/workmate-dashboard.png" alt="WorkMate dashboard" width="100%">
 </p>
 
